@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Request a creative discussion about the artwork, poetry, or learning notes.">
+<title>Creative Contact — Ingenious Conversation</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="whimsy/index.html">My Whimsy</a> |
+        <a href="work/index.html">My Work</a> |
+    </nav>
+</header>
+
+<main>
+  <h1>
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+      <path d="M2 5h20v14H2z" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M2 5l10 8 10-8" fill="none" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    I love creative collaboration!
+  </h1>
+    <p>Reach out if you are would like to discuss on an art project related to any of these topics.
+        <ul>
+            <li>Architecture</li>
+            <li>Biology</li>
+            <li>Computer Science</li>
+            <li>Etymology</li>
+            <li>Faith</li>
+            <li>History</li>
+            <li>Horticulture</li>
+            <li>Literature</li>
+            <li>Math</li>
+            <li>Music</li>
+            <li>Philosophy</li>
+            <li>Physics</li>
+            <li>Theology</li>
+        </ul>
+    </p>
+
+    <!-- Mailing form submissions to myself until I get a server-side solution -->
+  <form action="mailto:ankelley@ucsd.edu" method="post" enctype="text/plain">
+    <fieldset>
+      <legend>Collaboration request</legend>
+
+      <p>
+        <label for="cc-name">Name</label><br>
+        <input type="text" id="cc-name" name="name" required>
+      </p>
+
+      <fieldset>
+        <legend>Preferred medium</legend>
+        <p>
+          <label><input type="radio" name="medium" value="email" checked> Email</label>
+          <label><input type="radio" name="medium" value="call"> Call</label>
+          <label><input type="radio" name="medium" value="in-person"> In person</label>
+        </p>
+      </fieldset>
+
+      <p>
+        <label for="cc-message">What would the collaboration be for?</label><br>
+        <textarea id="cc-message" name="message" rows="5" cols="40" required></textarea>
+      </p>
+
+      <p><strong>Name and a topic are required</strong>.</p>
+      <button type="submit">Send collaboration request</button>
+    </fieldset>
+  </form>
+</main>
+
+<footer>
+  <p>A. Kelley &middot; <a href="mailto:ankelley@ucsd.edu">School Email</a> &middot; CSE 134B, Summer 2026</p>
+</footer>
+
+</body>
+</html>

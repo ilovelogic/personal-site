@@ -1,0 +1,16 @@
+/* Structural borders only, per HW2 constraint: no presentation beyond border/border-width */
+header, main, footer, nav, section, article, fieldset {
+  border: 1px solid #333;
+}
+
+.photo-grid img {
+  border: 1px solid #333;
+}
+
+/* custom element: exempt from the CSS property limit per the Custom Element #1 note */
+skill-story {
+  display: block;
+  border: 1px solid #333;
+  margin: 0.5em 0;
+  padding: 0.5em;
+}
