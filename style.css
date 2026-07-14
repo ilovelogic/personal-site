@@ -1,5 +1,5 @@
 /* Structural borders only, per HW2 constraint: no presentation beyond border/border-width */
-header, main, footer, nav, section, article, fieldset {
+header, main, footer, nav, section, article, fieldset, dialog, iframe, canvas, audio, video {
   border: 1px solid #333;
 }
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A demo page exercising template, audio, video, canvas, and source tags for CSE 134B HW2.">
+<title>Experiments</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="my_whimsy.html">My Whimsy</a> |
+        <a href="my_work.html">My Work</a> |
+    </nav>
+</header>
+
+<main>
+  <h1>Experiments</h1>
+  <p>A small collection of HTML features that don't fit naturally into the rest of the portfolio, kept here on their own page per the assignment instructions.</p>
+
+  <section aria-labelledby="template-h">
+    <h2 id="template-h">Template</h2>
+    <p>The markup below sits in a &lt;template&gt; tag, which the browser parses but never renders on its own. It holds an extra skill-toolbox entry ready for the day I fill in a tenth skill.</p>
+    <template id="skill-card-template">
+      <li>
+        <skill-story>
+          <h3>Reserved Slot</h3>
+          <p>Favorite use so far: (to be filled in once toolbox entry ten is ready).</p>
+        </skill-story>
+      </li>
+    </template>
+  </section>
+
+  <section aria-labelledby="audio-h">
+    <h2 id="audio-h">Audio</h2>
+    <p>A placeholder sample clip, standing in until I record my own narration. And yes, I know the source is from "w3fools" as my Prof would say LOL.</p>
+    <audio controls>
+      <source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+      <source src="https://www.w3schools.com/html/horse.ogg" type="audio/ogg">
+      Your browser does not support the audio element.
+    </audio>
+  </section>
+
+  <section aria-labelledby="video-h">
+    <h2 id="video-h">Video</h2>
+    <p>Another placeholder clip, again with two &lt;source&gt; formats, standing in for a future recorded walkthrough of my work.</p>
+    <video controls width="320" height="180">
+      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+      <source src="https://www.w3schools.com/html/mov_bbb.ogg" type="video/ogg">
+      Your browser does not support the video element.
+    </video>
+  </section>
+
+  <section aria-labelledby="canvas-h">
+    <h2 id="canvas-h">Canvas</h2>
+    <p>A minimal sine wave, drawn with a handful of lines of JavaScript, as a nod to the math background behind this site.</p>
+    <canvas id="wave-canvas" width="300" height="150"></canvas>
+    <script>
+      const ctx = document.getElementById("wave-canvas").getContext("2d");
+      ctx.strokeStyle = "#333";
+      ctx.beginPath();
+      for (let x = 0; x <= 300; x++) {
+        const y = 75 + 50 * Math.sin(x / 20);
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    </script>
+  </section>
+
+  <section aria-labelledby="hello-h">
+    <h2 id="hello-h">Custom Element: Hello World</h2>
+    <p>The tag below prints a greeting to the browser console when it connects to the page. It does not change anything you can see here.</p>
+    <hello-world></hello-world>
+    <script src="hello-world.js" defer></script>
+    <noscript>
+      <p>This tag needs JavaScript to print its console message; everything else on this site works without it.</p>
+    </noscript>
+  </section>
+
+  <section aria-labelledby="mathml-h">
+    <h2 id="mathml-h">Extra Credit: MathML</h2>
+    <p>Einstein's mass-energy equivalence, written with native MathML instead of an image or a LaTeX-rendering script:</p>
+    <math display="block">
+      <mi>E</mi>
+      <mo>=</mo>
+      <mi>m</mi>
+      <msup>
+        <mi>c</mi>
+        <mn>2</mn>
+      </msup>
+    </math>
+    <p>MathML has been part of the HTML specification since HTML5, but developers could not rely on it in production for most of that time. Internet Explorer never supported it at all, and Chrome's story was worse than simply "missing": Chrome 24 shipped MathML support, then pulled it back out in Chrome 25 because the implementation was unstable, leaving it absent from Chrome for roughly seven years (through Chrome 96). Firefox was the one steady exception, supporting MathML since Firefox 2. With that much fragmentation across the dominant browser, teams had to fall back on image snapshots of formulas or JavaScript rendering libraries such as MathJax or KaTeX instead of the native tag. Chrome only regained full, stable MathML support in version 109 (released January 2023), and Edge followed the same timeline since it is Chromium-based. That means reliable cross-browser native MathML is really only about two years old as of this writing, which is why a tag that has existed since the earliest HTML5 drafts still feels new today.</p>
+  </section>
+</main>
+
+<footer>
+  <p>A. Kelley &middot; <a href="mailto:ankelley@ucsd.edu">School Email</a> &middot; CSE 134B, Summer 2026</p>
+</footer>
+
+</body>
+</html>
