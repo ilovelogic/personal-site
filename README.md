@@ -1,1 +1,3 @@
-# personal-site
+# Poetry with a Pulse Website
+
+An exploration of beauty in logic and art...
