@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PR Pets — sprite sheet</title>
+<style>
+  body { font: 12px ui-sans-serif, system-ui, sans-serif; background: #f6f8fa; color: #1f2328;
+         margin: 0; padding: 12px 16px; }
+  h2 { font-size: 12px; margin: 10px 0 6px; letter-spacing: .02em; text-transform: uppercase;
+       color: #59636e; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+  .cell { background: #fff; border: 1px solid #d1d9e0; border-radius: 8px; padding: 4px;
+          text-align: center; }
+  .cell span { display: block; font-size: 9px; color: #59636e; margin-top: 2px; }
+  .dark { background: #0d1117; border-radius: 10px; padding: 8px 12px 12px; }
+  .dark h2 { color: #9198a1; }
+  .dark .cell { background: #151b23; border-color: #3d444d; }
+  .dark .cell span { color: #9198a1; }
+</style>
+</head>
+<body>
+<script src="needs-a-server.js"></script>
+
+<div id="out"></div>
+<script type="module">
+import * as PetState from '../src/model/petState.js';
+import { MOOD } from '../src/model/mood.js';
+import { petSvg } from '../src/view/sprites.js';
+import { bufoSvg } from '../src/view/bufo.js';
+import { BUFO } from '../src/model/phrases.js';
+
+const now = 1753400000000;
+const toby = PetState.create({ species: 'dog', name: 'Toby', installedAt: now });
+const jibble = PetState.create({ species: 'cat', name: 'Jibble', installedAt: now });
+const moods = [MOOD.BORED, MOOD.HAPPY, MOOD.HANGRY];
+
+const cell = (svg, label, w) =>
+  `<div class="cell"${w ? ` style="width:${w}px"` : ''}>${svg}<span>${label}</span></div>`;
+
+function section(title, cells, dark = false) {
+  document.getElementById('out').insertAdjacentHTML('beforeend',
+    `<div class="${dark ? 'dark' : ''}"><h2>${title}</h2><div class="row">${cells}</div></div>`);
+}
+
+const moodRow = (size) => [toby, jibble].flatMap(p =>
+  moods.map(m => cell(petSvg(p, m, { size }), `${p.name} · ${m}`))).join('');
+
+section('Moods · 76px shipping size &nbsp;+&nbsp; 130px detail',
+  moodRow(76) + [toby, jibble].flatMap(p =>
+    moods.map(m => cell(petSvg(p, m, { size: 130 }), `${p.name} · ${m}`))).join(''));
+
+section('Same, on GitHub dark', moodRow(96), true);
+
+section('Wardrobe', PetState.ACCESSORY_IDS.flatMap(id =>
+  [toby, jibble].map(p =>
+    cell(petSvg(PetState.setAccessories(p, [id]), MOOD.BORED, { size: 76 }), id))).join(''));
+
+section('Full kit + bufos',
+  [toby, jibble].map(p =>
+    cell(petSvg(PetState.setAccessories(p, [...PetState.ACCESSORY_IDS]), MOOD.HAPPY, { size: 130 }),
+         'everything')).join('') +
+  Object.values(BUFO).map(b => cell(bufoSvg(b, 44), b)).join(''));
+</script>
+</body>
+</html>

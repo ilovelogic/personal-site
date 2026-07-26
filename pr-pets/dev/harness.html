@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" data-color-mode="light">
+<head>
+<meta charset="utf-8">
+<title>PR Pets — live UI harness</title>
+<link rel="stylesheet" href="../src/view/styles.css">
+<style>
+  body { font: 13px ui-sans-serif, system-ui, sans-serif; background: #fff; color: #1f2328;
+         margin: 0; padding: 20px 24px 40px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .03em; color: #59636e;
+       margin: 22px 0 10px; }
+  .board { display: flex; gap: 40px; align-items: flex-end; flex-wrap: wrap; }
+  .slot { position: relative; width: 110px; height: 190px; border: 1px dashed #d1d9e0;
+          border-radius: 10px; }
+  .slot > .prpets-root { position: absolute; bottom: 10px; left: 10px; }
+  .caption { position: absolute; top: 6px; left: 8px; font-size: 10px; color: #59636e; }
+  .menuboard { position: relative; height: 470px; }
+  .menuboard > .prpets-root { position: absolute; bottom: 12px; left: 12px; }
+</style>
+</head>
+<body>
+<script src="needs-a-server.js"></script>
+
+<h2>Moods in situ (76px, bottom-left placement)</h2>
+<div class="board" id="moods"></div>
+
+<h2>Live — click a pet to open its menu, click it again to collapse</h2>
+<div class="menuboard" id="live"></div>
+
+<script type="module">
+// ---- chrome shim, so store.js runs unmodified -----------------------------
+// Seeded so the live stack below has a real history to chart and average.
+const H = 3600000;
+const T = Date.now();
+const memory = {
+  'prpets/v1': {
+    schemaVersion: 1,
+    enabled: true,
+    installedAt: T - 12 * 86400000,
+    pets: {
+      toby: { species: 'dog', name: 'Toby', accessories: ['beanie'],
+              installedAt: T - 12 * 86400000,
+              feedings: Array.from({ length: 20 }, (_, i) => T - (20 - i) * 9 * H),
+              happyUntil: 0, hangerOverrideMs: null },
+      jibble: { species: 'cat', name: 'Jibble', accessories: [],
+                installedAt: T - 12 * 86400000,
+                feedings: Array.from({ length: 12 }, (_, i) => T - (12 - i) * 14 * H),
+                happyUntil: 0, hangerOverrideMs: null },
+    },
+    speech: { toby: null, jibble: null },
+    handledEvents: [],
+  },
+};
+globalThis.chrome = {
+  storage: {
+    local: {
+      async get(key) { return key in memory ? { [key]: memory[key] } : {}; },
+      async set(bag) { Object.assign(memory, bag); },
+    },
+    onChanged: { addListener() {}, removeListener() {} },
+  },
+  runtime: { getURL: (p) => p },
+};
+
+import * as App from '../src/model/appState.js';
+import { PetCard } from '../src/view/petCard.js';
+import { PetMenu } from '../src/view/menu.js';
+
+// ---------------------------------------------------------------------------
+// Everything below is FABRICATED DEMO DATA for this development page only.
+// It is not loaded by the extension (the manifest never references dev/), and
+// nothing here ships to a user: a real install starts with zero feedings and
+// the 3-hour default, then learns that browser profile's own rhythm.
+// ---------------------------------------------------------------------------
+const NOW = Date.now();
+const DAY = 86400000;
+const HOUR = 3600000;
+const INSTALLED = NOW - 17 * DAY;
+
+/** A plausible fortnight of activity: busier midweek, quiet at weekends. */
+function history(seedCounts, lastFedOffset) {
+  // Anything seeded after the scenario's "last fed" instant is dropped —
+  // otherwise the pet's real last feeding is not the one the scenario names,
+  // and it is not in the mood the caption claims.
+  const cutoff = lastFedOffset === null ? Infinity : NOW - lastFedOffset;
+  const feedings = [];
+  seedCounts.forEach((count, dayIndex) => {
+    for (let i = 0; i < count; i++) {
+      const t = INSTALLED + dayIndex * DAY + (9 + i * 2) * HOUR;
+      if (t < cutoff) feedings.push(t);
+    }
+  });
+  if (lastFedOffset !== null) feedings.push(cutoff);
+  return feedings.sort((a, b) => a - b);
+}
+
+const TOBY_DAYS = [1, 3, 2, 0, 0, 4, 2, 1, 0, 5, 3, 0, 0, 2, 4, 1, 2];
+const JIBBLE_DAYS = [0, 2, 1, 1, 0, 3, 5, 2, 0, 1, 2, 0, 0, 4, 1, 3, 2];
+
+function makeApp({ tobyLast, jibbleLast, tobyHappy = 0, jibbleHappy = 0, speech = {},
+                   sparse = false }) {
+  // `sparse` gives a pet a single feeding, so its threshold is the 3h default
+  // rather than the ~15h it learns from a fortnight of real-looking history.
+  const tobyDays = sparse ? [] : TOBY_DAYS;
+  const jibbleDays = sparse ? [] : JIBBLE_DAYS;
+  return App.fromJSON({
+    enabled: true,
+    installedAt: INSTALLED,
+    pets: {
+      toby: { species: 'dog', name: 'Toby', accessories: ['beanie'], installedAt: INSTALLED,
+              feedings: history(tobyDays, tobyLast), happyUntil: tobyHappy },
+      jibble: { species: 'cat', name: 'Jibble', accessories: ['lanyard'], installedAt: INSTALLED,
+                feedings: history(jibbleDays, jibbleLast), happyUntil: jibbleHappy },
+    },
+    speech,
+    handledEvents: [],
+  }, NOW);
+}
+
+const SCENARIOS = [
+  { label: 'just fed (happy + bubble)',
+    app: makeApp({ tobyLast: 4000, jibbleLast: 6000, tobyHappy: NOW + 90000,
+                   jibbleHappy: NOW + 120000,
+                   speech: { toby: { text: 'thanks, me was hungry', bufo: 'yum' },
+                             jibble: { text: 'purr. good human.', bufo: 'love' } } }) },
+  { label: 'baseline boredom',
+    app: makeApp({ tobyLast: 40 * 60 * 1000, jibbleLast: 40 * 60 * 1000 }) },
+  { label: 'just tipped hangry (--hangry ≈ 0)',
+    app: makeApp({ tobyLast: 3.05 * HOUR, jibbleLast: 3.05 * HOUR, sparse: true }) },
+  { label: 'half hangry (--hangry ≈ 0.5)',
+    app: makeApp({ tobyLast: 4.5 * HOUR, jibbleLast: 4.5 * HOUR, sparse: true }) },
+  { label: 'fully hangry (--hangry = 1)',
+    app: makeApp({ tobyLast: 30 * HOUR, jibbleLast: 30 * HOUR }) },
+];
+
+const moods = document.getElementById('moods');
+for (const scenario of SCENARIOS) {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.innerHTML = `<span class="caption">${scenario.label}</span>`;
+
+  const root = document.createElement('div');
+  root.className = 'prpets-root';
+  const stack = document.createElement('div');
+  stack.className = 'prpets-stack';
+  for (const petId of App.PET_IDS) {
+    const card = new PetCard(petId, { onActivate() {} });
+    card.render(scenario.app, NOW);
+    stack.append(card.el);
+  }
+  root.append(stack);
+  slot.append(root);
+  moods.append(slot);
+}
+
+// ---- a live, interactive stack -------------------------------------------
+// This mirrors the real controller's wiring against the fake chrome.storage
+// above. An earlier version of this harness passed no-op handlers, which made
+// it a static mockup: clicking an accessory or typing a name did nothing, and
+// the interactive paths were never actually exercised here. They are now.
+
+import * as Store from '../src/storage/store.js';
+
+const live = document.getElementById('live');
+const root = document.createElement('div');
+root.className = 'prpets-root';
+const stack = document.createElement('div');
+stack.className = 'prpets-stack';
+
+let app = await Store.read();
+const cards = new Map();
+let menu;
+
+function render() {
+  const now = Date.now();
+  for (const card of cards.values()) card.render(app, now);
+  menu.refresh(app, now);
+}
+
+async function commit(mutate) {
+  app = await Store.update(mutate);
+  render();
+}
+
+for (const petId of App.PET_IDS) {
+  const card = new PetCard(petId, { onActivate: (id) => toggleMenu(id) });
+  cards.set(petId, card);
+  stack.append(card.el);
+}
+
+menu = new PetMenu({
+  onRename: (petId, name) => commit((a) => App.renamePet(a, petId, name)),
+  onToggleAccessory: (petId, id) => commit((a) => App.toggleAccessory(a, petId, id)),
+  onSetHangerOverride: (petId, ms) => commit((a) => App.setHangerOverride(a, petId, ms)),
+  onClose: () => closeMenu(),
+});
+
+function toggleMenu(petId) {
+  if (menu.isOpen && menu.petId === petId) return closeMenu();
+  menu.el.dataset.petId = petId;
+  menu.open(petId, app, Date.now());
+  for (const [id, card] of cards) card.setMenuOpen(id === petId);
+}
+
+function closeMenu() {
+  if (!menu.isOpen) return;
+  menu.close();
+  for (const card of cards.values()) card.setMenuOpen(false);
+}
+
+document.addEventListener('click', () => closeMenu());
+root.append(stack, menu.el);
+live.append(root);
+render();
+</script>
+</body>
+</html>

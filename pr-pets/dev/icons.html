@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PR Pets — icon generator</title>
+<style>
+  body { font: 13px ui-sans-serif, system-ui, sans-serif; padding: 20px; background: #f6f8fa; }
+  canvas { border: 1px solid #d1d9e0; border-radius: 6px; background: #fff; margin-right: 10px;
+           vertical-align: bottom; }
+</style>
+</head>
+<body>
+<script src="needs-a-server.js"></script>
+
+<p>Dev-only. Renders the toolbar icon from the real sprites, then exposes the PNG
+bytes on <code>window.__icons</code> for the build step to write out.</p>
+<div id="out"></div>
+<script type="module">
+import * as PetState from '../src/model/petState.js';
+import { MOOD } from '../src/model/mood.js';
+import { petSvg } from '../src/view/sprites.js';
+
+const T = 1753400000000;
+const toby = PetState.create({ species: 'dog', name: 'Toby', installedAt: T });
+const jibble = PetState.create({ species: 'cat', name: 'Jibble', installedAt: T });
+
+/** Re-crop a sprite to just the head, so it survives being 16px wide. */
+function head(pet, viewBox) {
+  return petSvg(pet, MOOD.HAPPY, { size: 100, decorate: false })
+    .replace('viewBox="0 0 100 100"', `viewBox="${viewBox}"`);
+}
+
+function toImage(svg) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+}
+
+const dog = await toImage(head(toby, '14 12 72 62'));
+const cat = await toImage(head(jibble, '24 2 52 62'));
+
+const icons = {};
+for (const size of [16, 32, 48, 128]) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Toby fills most of the tile; Jibble peeks in from the lower right, which
+  // keeps two animals legible at 128 and reads as one warm blob at 16.
+  ctx.drawImage(dog, size * 0.0, size * 0.02, size * 0.78, size * 0.78);
+  ctx.drawImage(cat, size * 0.44, size * 0.34, size * 0.62, size * 0.66);
+
+  icons[size] = canvas.toDataURL('image/png').split(',')[1];
+  document.getElementById('out').append(canvas);
+}
+window.__icons = icons;
+</script>
+</body>
+</html>

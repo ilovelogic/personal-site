@@ -1,0 +1,11 @@
+{
+  "name": "pr-pets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Chrome extension: a cartoon puppy and kitten that live on your GitHub pull requests.",
+  "scripts": {
+    "test": "node --test 'test/*.test.js'",
+    "package": "npm test && rm -f pr-pets.zip && zip -qr pr-pets.zip manifest.json icons src -x '*.DS_Store' && unzip -l pr-pets.zip"
+  }
+}

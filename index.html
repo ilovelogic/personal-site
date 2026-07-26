@@ -3,9 +3,19 @@
     <head>
         <meta charset="utf-8">
         <title>Poetrywithapulse Homepage</title>
+        <link rel="stylesheet" href="style.css">
         <style>
-        /* page-specific border */
-        .photo-grid img { border: 1px solid #333; }
+        /* page-specific layout; border color reuses the site's shared sunset accent variable */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+            gap: 0.75rem;
+            align-items: start;
+        }
+        .photo-grid img {
+            border: 0.2rem solid var(--color-coral, #333);
+            border-radius: 0.5rem;
+        }
         </style>
     </head>
     <body>
@@ -42,7 +52,7 @@
         </main>
 
         <footer>
-        <p>Anne Kelley &middot; <a href="mailto:ankelley@ucsd.edu">School Email</a> &middot; CSE 134B, Summer 2026 &middot; <a href="experiments.html">Experiments</a></p>
+        <p>Anne Kelley &middot; <a href="mailto:ankelley@ucsd.edu">School Email</a> &middot; CSE 134B, Summer 2026</p>
         </footer>
 
         <script src="https://analytics.example.com/tag.js" defer></script>

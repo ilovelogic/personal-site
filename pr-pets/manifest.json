@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "PR Pets: Toby and Jibble",
+  "version": "1.0.0",
+  "description": "A cartoon puppy and kitten live in the corner of your GitHub pull requests. Open a PR to feed Toby, submit a review to feed Jibble.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://github.com/*"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "PR Pets",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["src/content/loader.js"],
+      "css": ["src/view/styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/model/*.js",
+        "src/storage/*.js",
+        "src/view/*.js",
+        "src/content/*.js"
+      ],
+      "matches": ["https://github.com/*"]
+    }
+  ]
+}

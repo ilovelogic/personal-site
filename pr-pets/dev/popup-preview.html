@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PR Pets — popup preview</title>
+<link rel="stylesheet" href="../src/popup/popup.css">
+<style>
+  html { background: #eef1f4; }
+  body { margin: 20px auto; border: 1px solid #d1d9e0; border-radius: 10px; }
+</style>
+</head>
+<body>
+<script src="needs-a-server.js"></script>
+
+<script type="module">
+// Dev-only preview: runs the real popup markup and the real popup.js against a
+// fake chrome.storage seeded with fabricated history. Nothing here ships.
+const DAY = 86400000;
+const NOW = Date.now();
+const feedings = (n, spacing) =>
+  Array.from({ length: n }, (_, i) => NOW - (n - i) * spacing);
+
+const memory = {
+  'prpets/v1': {
+    schemaVersion: 1,
+    enabled: true,
+    installedAt: NOW - 12 * DAY,
+    pets: {
+      toby: { species: 'dog', name: 'Toby', accessories: ['beanie'],
+              installedAt: NOW - 12 * DAY, feedings: feedings(23, 9 * 3600_000),
+              happyUntil: 0 },
+      jibble: { species: 'cat', name: 'Jibble', accessories: [],
+                installedAt: NOW - 12 * DAY, feedings: feedings(14, 18 * 3600_000),
+                happyUntil: NOW + 120_000 },
+    },
+    speech: { toby: null, jibble: { text: 'purr. good human.', bufo: 'love' } },
+    handledEvents: [],
+  },
+};
+
+globalThis.chrome = {
+  storage: {
+    local: {
+      async get(key) { return key in memory ? { [key]: memory[key] } : {}; },
+      async set(bag) { Object.assign(memory, bag); },
+    },
+    onChanged: { addListener() {}, removeListener() {} },
+  },
+  runtime: { getURL: (p) => p },
+};
+
+const html = await fetch('../src/popup/popup.html').then((r) => r.text());
+const parsed = new DOMParser().parseFromString(html, 'text/html');
+// innerHTML does not execute the inline module tag, so popup.js is imported
+// explicitly below — the same file the real popup loads.
+document.body.innerHTML = parsed.body.innerHTML;
+await import('../src/popup/popup.js');
+</script>
+</body>
+</html>

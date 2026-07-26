@@ -1,0 +1,501 @@
+/**
+ * PR Pets: Toby and Jibble — styles.
+ *
+ * The `prpets-` class prefix, the `prpets/v1` storage key and the `[PR Pets]`
+ * log prefix are deliberately *not* renamed along with the extension: the
+ * first two are identifiers real users' saved pets depend on, and renaming
+ * them would quietly reset everybody's pets.
+ *
+ * Two things this file has to survive: GitHub's own stylesheet, which is broad
+ * and will happily restyle a bare <button> or <input> inside our panel; and
+ * GitHub's four theme states (light, dark, and "auto" resolving either way).
+ *
+ * The first is handled by naming every element and setting the properties that
+ * matter explicitly rather than inheriting them. The second is handled by
+ * declaring the palette once as custom properties and re-declaring only those
+ * for dark — so nothing below the palette block ever mentions a theme.
+ */
+
+.prpets-root {
+  --prpets-surface: #ffffff;
+  --prpets-surface-sunken: #f6f8fa;
+  --prpets-border: #d1d9e0;
+  --prpets-text: #1f2328;
+  --prpets-text-muted: #59636e;
+  --prpets-grid: #d8dee4;
+  --prpets-shadow: 0 8px 24px rgba(31, 35, 40, 0.16);
+  --prpets-accent: #2a78d6;
+
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 9998;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
+    Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--prpets-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Dark, in each of the ways GitHub can ask for it. */
+html[data-color-mode="dark"] .prpets-root,
+html[data-color-mode="auto"][data-dark-theme] .prpets-root:where(.prpets-dark-auto) {
+  --prpets-surface: #151b23;
+  --prpets-surface-sunken: #0d1117;
+  --prpets-border: #3d444d;
+  --prpets-text: #e6edf3;
+  --prpets-text-muted: #9198a1;
+  --prpets-grid: #3d444d;
+  --prpets-shadow: 0 8px 24px rgba(1, 4, 9, 0.6);
+  --prpets-accent: #3987e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-color-mode="light"]) .prpets-root {
+    --prpets-surface: #151b23;
+    --prpets-surface-sunken: #0d1117;
+    --prpets-border: #3d444d;
+    --prpets-text: #e6edf3;
+    --prpets-text-muted: #9198a1;
+    --prpets-grid: #3d444d;
+    --prpets-shadow: 0 8px 24px rgba(1, 4, 9, 0.6);
+    --prpets-accent: #3987e5;
+  }
+}
+
+/* Each pet owns a hue, and it follows the pet into its menu and its chart. */
+.prpets-pet[data-pet-id="toby"],
+.prpets-menu[data-pet-id="toby"] {
+  --prpets-accent: #eb6834;
+}
+html[data-color-mode="dark"] .prpets-pet[data-pet-id="toby"],
+html[data-color-mode="dark"] .prpets-menu[data-pet-id="toby"] {
+  --prpets-accent: #d95926;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-color-mode="light"]) .prpets-pet[data-pet-id="toby"],
+  html:not([data-color-mode="light"]) .prpets-menu[data-pet-id="toby"] {
+    --prpets-accent: #d95926;
+  }
+}
+
+/* ------------------------------------------------------------- the stack */
+
+.prpets-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.prpets-pet {
+  position: relative;
+}
+
+.prpets-button {
+  all: unset;
+  display: block;
+  position: relative;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 2px;
+  transition: transform 140ms ease, background-color 140ms ease;
+}
+
+.prpets-button:hover {
+  transform: translateY(-2px);
+}
+
+.prpets-button:focus-visible {
+  outline: 2px solid var(--prpets-accent);
+  outline-offset: 2px;
+}
+
+.prpets-svg {
+  display: block;
+  transform-origin: 50% 92%;
+}
+
+/* -------------------------------------------------------------- the moods */
+
+/* Baseline: a slow blink, so a bored pet is not a still image. */
+.prpets-blinker {
+  animation: prpets-blink 6.5s infinite;
+  transform-origin: 50% 39%;
+}
+
+@keyframes prpets-blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96.5% { transform: scaleY(0.08); }
+}
+
+/* Happy: a short burst of excitement, then a calm breath that lasts the rest
+   of the window. A pet that bounced for five solid minutes would be exactly
+   the distraction this extension is trying not to be. */
+.prpets-pet.is-happy .prpets-svg {
+  animation: prpets-bounce 520ms ease-in-out 3, prpets-breathe 3.4s ease-in-out 1.6s infinite;
+}
+
+@keyframes prpets-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-7px) scale(1.04, 0.97); }
+  70% { transform: translateY(0) scale(0.98, 1.02); }
+}
+
+@keyframes prpets-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+.prpets-sparkle {
+  animation: prpets-twinkle 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 260ms);
+  transform-origin: center;
+}
+
+@keyframes prpets-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* Hangry: everything here is scaled by --hangry, which runs 0 → 1 over
+   several hours. At the start it is a barely-perceptible slump; only much
+   later does it become obvious. Nothing switches on abruptly. */
+.prpets-pet.is-hangry .prpets-svg {
+  filter: saturate(calc(1 - 0.3 * var(--hangry, 0)));
+  animation: prpets-sway 5.4s ease-in-out infinite;
+}
+
+@keyframes prpets-sway {
+  0%, 100% { transform: rotate(0deg) translateY(calc(1.5px * var(--hangry, 0))); }
+  50% { transform: rotate(calc(-1.6deg * var(--hangry, 0))) translateY(calc(2.5px * var(--hangry, 0))); }
+}
+
+.prpets-hunger {
+  position: absolute;
+  right: -4px;
+  bottom: 2px;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 600ms ease, transform 600ms ease;
+  pointer-events: none;
+}
+
+.prpets-pet.is-hangry .prpets-hunger {
+  opacity: calc(0.2 + 0.55 * var(--hangry, 0));
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------ the bubble */
+
+.prpets-bubble {
+  position: absolute;
+  left: 68px;
+  bottom: 46px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  /* The bubble is absolutely positioned inside a ~80px-wide pet, so without an
+     intrinsic width it would shrink to the few pixels left over after the
+     `left` offset. max-content sizes it to the phrase; max-width then wraps
+     the long ones. */
+  width: max-content;
+  max-width: 190px;
+  padding: 6px 9px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 12px 12px 12px 3px;
+  background: var(--prpets-surface);
+  box-shadow: var(--prpets-shadow);
+  color: var(--prpets-text);
+  font-size: 12px;
+  /* Wrapping rather than nowrap: the longer lines ("me will allow the sitting
+     near me") would otherwise run off the side of the bubble. */
+  text-wrap: pretty;
+  pointer-events: none;
+  animation: prpets-pop 260ms cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.prpets-bubble[hidden] {
+  display: none;
+}
+
+.prpets-bubble .prpets-bufo {
+  flex: none;
+}
+
+@keyframes prpets-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.85); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* -------------------------------------------------------------- the menu */
+
+.prpets-menu {
+  position: absolute;
+  left: 92px;
+  bottom: 0;
+  width: 284px;
+  box-sizing: border-box;
+  padding: 14px 16px 16px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 14px;
+  background: var(--prpets-surface);
+  box-shadow: var(--prpets-shadow);
+  max-height: min(560px, calc(100vh - 48px));
+  overflow-y: auto;
+}
+
+.prpets-menu[hidden] {
+  display: none;
+}
+
+.prpets-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prpets-menu-portrait {
+  flex: none;
+  display: block;
+}
+
+.prpets-field {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.prpets-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--prpets-text-muted);
+  margin-bottom: 3px;
+}
+
+.prpets-name-input {
+  all: unset;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 6px;
+  background: var(--prpets-surface-sunken);
+  color: var(--prpets-text);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.prpets-name-input:focus {
+  border-color: var(--prpets-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--prpets-accent) 30%, transparent);
+}
+
+.prpets-menu-status {
+  margin: 10px 0 0;
+  color: var(--prpets-text-muted);
+  font-size: 11.5px;
+}
+
+.prpets-section {
+  margin-top: 14px;
+}
+
+.prpets-section-title {
+  margin: 0 0 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--prpets-text-muted);
+}
+
+/* ------------------------------------------------- the hunger-window field */
+
+.prpets-hunger-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.prpets-amount-input,
+.prpets-unit-select {
+  all: unset;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 6px;
+  background: var(--prpets-surface-sunken);
+  color: var(--prpets-text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: text;
+}
+
+.prpets-amount-input {
+  width: 74px;
+  font-variant-numeric: tabular-nums;
+}
+
+.prpets-unit-select {
+  cursor: pointer;
+  padding-right: 6px;
+}
+
+/* On "auto" the number is inherited from the average rather than chosen, so
+   it is shown a shade quieter — present and readable, but visibly not a
+   setting the user has committed to. */
+.prpets-amount-input.is-inherited {
+  color: var(--prpets-text-muted);
+  font-style: italic;
+}
+
+.prpets-amount-input:focus,
+.prpets-unit-select:focus-visible {
+  border-color: var(--prpets-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--prpets-accent) 30%, transparent);
+}
+
+.prpets-amount-input:invalid {
+  border-color: #d1242f;
+}
+
+.prpets-revert {
+  all: unset;
+  display: inline-block;
+  margin-top: 7px;
+  cursor: pointer;
+  padding: 4px 9px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 999px;
+  background: var(--prpets-surface-sunken);
+  color: var(--prpets-text-muted);
+  font-size: 11.5px;
+  font-family: inherit;
+}
+
+.prpets-revert:hover {
+  border-color: var(--prpets-accent);
+  color: var(--prpets-text);
+}
+
+.prpets-revert:focus-visible {
+  outline: 2px solid var(--prpets-accent);
+  outline-offset: 2px;
+}
+
+.prpets-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.prpets-chip {
+  all: unset;
+  cursor: pointer;
+  padding: 4px 9px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 999px;
+  background: var(--prpets-surface-sunken);
+  color: var(--prpets-text-muted);
+  font-size: 11.5px;
+  font-family: inherit;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.prpets-chip:hover {
+  border-color: var(--prpets-accent);
+  color: var(--prpets-text);
+}
+
+.prpets-chip[aria-pressed="true"] {
+  background: var(--prpets-accent);
+  border-color: var(--prpets-accent);
+  color: #ffffff;
+}
+
+.prpets-chip:focus-visible {
+  outline: 2px solid var(--prpets-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- the chart */
+
+.prpets-chart {
+  position: relative;
+  margin: 0;
+}
+
+.prpets-chart svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.prpets-chart-tick {
+  font-size: 9px;
+  fill: var(--prpets-text-muted);
+  font-family: inherit;
+}
+
+.prpets-chart-value {
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--prpets-text);
+  font-family: inherit;
+}
+
+.prpets-chart-hit:hover {
+  fill: color-mix(in srgb, var(--prpets-accent) 12%, transparent);
+}
+
+.prpets-chart-tip {
+  position: absolute;
+  bottom: 100%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border: 1px solid var(--prpets-border);
+  border-radius: 6px;
+  background: var(--prpets-surface);
+  box-shadow: var(--prpets-shadow);
+  color: var(--prpets-text);
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.prpets-chart-tip[hidden] {
+  display: none;
+}
+
+.prpets-menu-note {
+  margin: 8px 0 0;
+  color: var(--prpets-text-muted);
+  font-size: 10.5px;
+}
+
+/* ------------------------------------------------------------- utilities */
+
+.prpets-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prpets-root *,
+  .prpets-root *::before,
+  .prpets-root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

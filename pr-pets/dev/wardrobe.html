@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PR Pets — wardrobe check</title>
+<style>
+  body { font: 12px ui-sans-serif, system-ui, sans-serif; background: #f6f8fa; color: #1f2328;
+         margin: 0; padding: 16px; }
+  h2 { font-size: 12px; margin: 14px 0 8px; text-transform: uppercase; color: #59636e; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cell { background: #fff; border: 1px solid #d1d9e0; border-radius: 10px; padding: 6px;
+          text-align: center; }
+  .cell span { display: block; font-size: 10px; color: #59636e; margin-top: 2px; }
+</style>
+</head>
+<body>
+<script src="needs-a-server.js"></script>
+
+<div id="out"></div>
+<script type="module">
+import * as PetState from '../src/model/petState.js';
+import { MOOD } from '../src/model/mood.js';
+import { petSvg } from '../src/view/sprites.js';
+
+const now = 1753400000000;
+const base = {
+  dog: PetState.create({ species: 'dog', name: 'Toby', installedAt: now }),
+  cat: PetState.create({ species: 'cat', name: 'Jibble', installedAt: now }),
+};
+
+const OUTFITS = [
+  ['hoodie'],
+  ['usbhub'],
+  ['backpack'],
+  ['beanie'],
+  ['hoodie', 'usbhub'],
+  ['beanie', 'hoodie', 'usbhub'],
+  ['backpack', 'hoodie', 'usbhub', 'lanyard'],
+  ['beanie', 'glasses', 'headphones'],
+  ['beanie', 'hoodie', 'usbhub', 'glasses', 'headphones', 'lanyard', 'backpack'],
+];
+
+const out = document.getElementById('out');
+for (const outfit of OUTFITS) {
+  const cells = ['dog', 'cat']
+    .map((sp) => {
+      const pet = PetState.setAccessories(base[sp], outfit);
+      return `<div class="cell">${petSvg(pet, MOOD.BORED, { size: 150 })}<span>${sp}</span></div>`;
+    })
+    .join('');
+  out.insertAdjacentHTML('beforeend',
+    `<h2>${outfit.join(' + ')}</h2><div class="row">${cells}</div>`);
+}
+</script>
+</body>
+</html>

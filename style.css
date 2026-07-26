@@ -1,16 +1,223 @@
-/* Structural borders only, per HW2 constraint: no presentation beyond border/border-width */
-header, main, footer, nav, section, article, fieldset, dialog, iframe, canvas, audio, video {
-  border: 1px solid #333;
+/* ---------- Variables ---------- */
+/* CSS custom properties instead of magic values (per lecture: "try to avoid CSS magic values") */
+:root {
+  --hue-dusk: 262;
+  --hue-plum: 322;
+  --hue-coral: 12;
+  --hue-amber: 36;
+  /* dedicated gentler hue for header/footer only: a muted dusty rose, warmer and lighter than --hue-dusk */
+  --hue-header: 350;
+
+  --color-sky-deep: hsl(var(--hue-dusk), 48%, 14%);
+  --color-sky-mid: hsl(var(--hue-plum), 55%, 28%);
+  --color-coral: hsl(var(--hue-coral), 82%, 60%);
+  --color-coral-deep: hsl(var(--hue-coral), 70%, 42%);
+  --color-amber: hsl(var(--hue-amber), 88%, 63%);
+  --color-cream: hsl(var(--hue-amber), 60%, 97%);
+  --color-text: hsl(var(--hue-dusk), 35%, 14%);
+  --color-text-on-dusk: hsl(var(--hue-amber), 55%, 94%);
+
+  --color-header-start: hsl(var(--hue-header), 28%, 40%);
+  --color-header-end: hsl(var(--hue-coral), 38%, 48%);
+
+  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: Georgia, "Times New Roman", serif;
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+
+  --radius: 0.75rem;
+  --shadow-card: 0 0.25rem 1rem hsla(var(--hue-dusk), 60%, 15%, 0.15);
+
+  --transition-fast: 150ms ease;
 }
 
-.photo-grid img {
-  border: 1px solid #333;
+/* ---------- Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-/* custom element: exempt from the CSS property limit per the Custom Element #1 note */
-skill-story {
+body {
+  margin: 0;
+}
+
+img, picture, svg {
+  max-width: 100%;
+}
+
+/* ---------- Base elements ---------- */
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  line-height: 1.6;
+  background:
+    radial-gradient(ellipse at top, hsl(var(--hue-amber), 90%, 88%), transparent 60%),
+    linear-gradient(180deg, hsl(var(--hue-coral), 70%, 80%) 0%, hsl(var(--hue-plum), 45%, 70%) 55%, var(--color-sky-mid) 100%);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  color: var(--color-coral-deep);
+  line-height: 1.25;
+}
+
+a {
+  color: var(--color-coral-deep);
+}
+
+a:hover, a:focus-visible {
+  color: var(--color-amber);
+  text-decoration-style: wavy;
+}
+
+/* ---------- Header & footer ---------- */
+header, footer {
+  background: linear-gradient(120deg, var(--color-header-start), var(--color-header-end));
+  color: var(--color-text-on-dusk);
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-md);
+}
+
+header nav a, footer a {
+  color: var(--color-amber);
+  text-decoration: none;
+  padding-inline: var(--space-xs);
+}
+
+header nav a:hover, header nav a:focus-visible,
+footer a:hover, footer a:focus-visible {
+  color: var(--color-cream);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}
+
+/* ---------- Main layout ---------- */
+main {
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: var(--space-lg);
+  background: hsla(var(--hue-amber), 60%, 97%, 0.9);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  margin-block: var(--space-lg);
+}
+
+/* ---------- Cards: section, article, custom skill-story element ---------- */
+section, article, skill-story {
   display: block;
-  border: 1px solid #333;
-  margin: 0.5em 0;
-  padding: 0.5em;
+  background: var(--color-cream);
+  border-inline-start: 0.3rem solid var(--color-coral);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-block: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Lists ---------- */
+ul, ol {
+  padding-inline-start: var(--space-lg);
+}
+
+li::marker {
+  color: var(--color-coral-deep);
+}
+
+/* ---------- Forms ---------- */
+fieldset {
+  border: 1px solid hsl(var(--hue-coral), 40%, 80%);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-block: var(--space-md);
+}
+
+legend {
+  color: var(--color-coral-deep);
+  font-weight: bold;
+  padding-inline: var(--space-xs);
+}
+
+label {
+  display: inline-block;
+  margin-block-end: var(--space-xs);
+}
+
+input, textarea, button {
+  font: inherit;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: var(--space-xs);
+  border: 1px solid hsl(var(--hue-coral), 40%, 75%);
+  border-radius: calc(var(--radius) / 2);
+  background: white;
+}
+
+input[type="text"]:focus-visible, textarea:focus-visible {
+  outline: 0.15rem solid var(--color-amber);
+  outline-offset: 0.1rem;
+}
+
+input[type="radio"], progress {
+  accent-color: var(--color-coral-deep);
+}
+
+button {
+  background: linear-gradient(120deg, var(--color-coral), var(--color-amber));
+  color: var(--color-sky-deep);
+  border: none;
+  border-radius: calc(var(--radius) / 2);
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-md);
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+}
+
+button:hover, button:focus-visible {
+  filter: brightness(1.1);
+}
+
+progress {
+  width: 100%;
+}
+
+/* ---------- Dialog ---------- */
+dialog {
+  border: 1px solid var(--color-amber);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Accessibility: user preferences win ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-cream: hsl(var(--hue-dusk), 30%, 18%);
+    --color-text: hsl(var(--hue-amber), 40%, 92%);
+    --color-text-on-dusk: hsl(var(--hue-amber), 55%, 94%);
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, hsl(var(--hue-plum), 45%, 24%), transparent 60%),
+      linear-gradient(180deg, hsl(var(--hue-plum), 40%, 18%) 0%, var(--color-sky-deep) 100%);
+  }
+
+  main {
+    background: hsla(var(--hue-dusk), 30%, 18%, 0.92);
+  }
+
+  input[type="text"], textarea {
+    background: hsl(var(--hue-dusk), 25%, 22%);
+    color: var(--color-text);
+  }
 }
