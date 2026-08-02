@@ -1,0 +1,127 @@
+/* ---------- Romantic Academia ----------
+   A second look for poetry.html only. Every other page keeps style.css,
+   which stays the site's default.
+
+   The reference is my own lanterns: gold paint, a hand-lettered panel
+   taped inside, a candle behind the paper. So the page is warm paper,
+   brass rules, and rose ink, lit from the top.
+
+   Rough draft. Colour, type, and spacing are in; texture, the webfonts,
+   and the dusk theme come next. */
+
+/* ---------- Variables ---------- */
+:root {
+  --hue-gold: 38;
+  --hue-rose: 348;
+  --hue-ink: 22;
+
+  --color-paper: hsl(var(--hue-gold), 52%, 96%);
+  --color-page: hsl(var(--hue-gold), 64%, 99%);
+  --color-ink: hsl(var(--hue-ink), 22%, 19%);
+  --color-ink-soft: hsl(var(--hue-ink), 14%, 36%);
+  --color-gold: hsl(var(--hue-gold), 46%, 45%);
+  --color-rose: hsl(var(--hue-rose), 36%, 42%);
+
+  --font-body: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  --font-heading: "Palatino Linotype", Palatino, Georgia, serif;
+
+  /* a poem line should never outrun the eye */
+  --measure: 36rem;
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+
+  --rule: 1px solid var(--color-gold);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding-inline: var(--space-md);
+  background-color: var(--color-paper);
+  /* the candle behind the paper: a faint warm wash at the top, nothing you
+     should notice while reading */
+  background-image: radial-gradient(ellipse at top, hsla(var(--hue-gold), 70%, 84%, 0.3), transparent 55%);
+  background-repeat: no-repeat;
+  background-size: 100% 28rem;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+}
+
+/* ---------- Layout ---------- */
+header, main, footer {
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+header {
+  padding-block: var(--space-sm);
+  border-block-end: var(--rule);
+  text-align: center;
+}
+
+footer {
+  padding-block: var(--space-md);
+  border-block-start: var(--rule);
+  color: var(--color-ink-soft);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+}
+
+/* Each poem is its own taped-down square of paper, so the corners stay sharp */
+article {
+  margin-block: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-page);
+  border: var(--rule);
+}
+
+article p {
+  margin: 0;
+}
+
+/* ---------- Type ---------- */
+h1, h2 {
+  font-family: var(--font-heading);
+  font-weight: normal;
+  line-height: 1.3;
+}
+
+h1 {
+  margin-block: var(--space-lg) var(--space-xs);
+  font-size: 2.25rem;
+  text-align: center;
+}
+
+h2 {
+  margin-block: 0 var(--space-sm);
+  font-size: 1.375rem;
+  font-style: italic;
+  color: var(--color-rose);
+}
+
+/* ---------- Links ---------- */
+a {
+  color: var(--color-rose);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--color-gold);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 3px;
+}
