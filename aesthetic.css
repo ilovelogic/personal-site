@@ -1,6 +1,9 @@
 /* ---------- Romantic Academia ---------- */
 
-/*  ⸜(｡˃ ᵕ ˂ )⸝♡ */
+/*  ⸜(｡˃ ᵕ ˂ )⸝♡
+
+    Colour sits in two layers. The theme layer holds the values and every
+    rule below points at it, so a new theme only restates that block. */
 
 /* ---------- Theme ---------- */
 :root {
