@@ -1,14 +1,10 @@
 /* ---------- Romantic Academia ----------
-   A second look for poetry.html only. Every other page keeps style.css,
-   which stays the site's default.
+   For poetry.html only. Every other page keeps style.css as the default.
+   The palette comes from my gold lanterns: warm paper, brass rules, rose
+   ink, a candle behind the panel.
 
-   The reference is my own lanterns: gold paint, a hand-lettered panel
-   taped inside, a candle behind the paper. So the page is warm paper,
-   brass rules, and rose ink, lit from the top.
-
-   Colours are declared in two layers. The theme layer holds the actual
-   values, and everything else points at the theme instead of repeating a
-   colour, so a second theme only has to redefine the top block. */
+   Colour sits in two layers. The theme layer holds the values and every
+   rule below points at it, so a new theme only restates that block. */
 
 /* ---------- Theme ---------- */
 :root {
@@ -21,10 +17,22 @@
   --theme-ink: hsl(var(--hue-ink), 22%, 19%);
   --theme-ink-soft: hsl(var(--hue-ink), 14%, 36%);
   --theme-brass: hsl(var(--hue-gold), 46%, 45%);
-  /* the hairline brass is too pale to read as text, so text gets a darker one */
-  --theme-brass-deep: hsl(var(--hue-gold), 60%, 30%);
+  /* the hairline brass fails contrast as text, so text uses this one */
+  --theme-brass-text: hsl(var(--hue-gold), 60%, 30%);
   --theme-rose: hsl(var(--hue-rose), 36%, 42%);
   --theme-candle: hsla(var(--hue-gold), 70%, 84%, 0.3);
+}
+
+/* Dusk repoints the theme layer, so no rule below needs to know it exists. */
+[data-theme="dusk"] {
+  --theme-paper: hsl(var(--hue-ink), 18%, 13%);
+  --theme-paper-lit: hsl(var(--hue-ink), 16%, 17%);
+  --theme-ink: hsl(var(--hue-gold), 30%, 92%);
+  --theme-ink-soft: hsl(var(--hue-gold), 18%, 74%);
+  --theme-brass: hsl(var(--hue-gold), 55%, 55%);
+  --theme-brass-text: hsl(var(--hue-gold), 70%, 70%);
+  --theme-rose: hsl(var(--hue-rose), 55%, 76%);
+  --theme-candle: hsla(var(--hue-gold), 80%, 60%, 0.18);
 }
 
 /* ---------- Components ---------- */
@@ -32,11 +40,10 @@
   --font-body: Georgia, "Iowan Old Style", "Times New Roman", serif;
   --font-heading: "Cormorant Garamond", Palatino, Georgia, serif;
 
-  /* clamp keeps the headings in step with the viewport without a media query */
   --page-title-size: clamp(2rem, 1.6rem + 1.8vw, 2.75rem);
   --poem-title-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
 
-  /* ch measures in characters, so a poem line never outruns the eye */
+  /* ch so the measure tracks the font, not the viewport */
   --page-measure: 62ch;
   --page-gutter: 1.25rem;
 
@@ -63,8 +70,7 @@ body {
   margin: 0;
   padding-inline: var(--page-gutter);
   background-color: var(--theme-paper);
-  /* the candle behind the paper: a faint warm wash at the top, nothing you
-     should notice while reading */
+  /* the candle behind the paper, kept faint enough to read over */
   background-image: radial-gradient(ellipse at top, var(--theme-candle), transparent 55%);
   background-repeat: no-repeat;
   background-size: 100% 28rem;
@@ -73,6 +79,7 @@ body {
   line-height: 1.7;
   /* a long poem line breaks instead of pushing the page sideways */
   overflow-wrap: break-word;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 /* ---------- Layout ---------- */
@@ -131,15 +138,14 @@ main > p {
 }
 
 /* ---------- Poems ---------- */
-/* Each poem is a square of paper taped to the wall, so the corners stay
-   sharp and it hangs a little crooked. Hover straightens it. */
+/* A page taped to the wall: square corners, hanging slightly crooked. */
 article.poem {
   margin-block: var(--space-lg);
   padding: var(--space-md);
   background: var(--theme-paper-lit);
   border: var(--hairline);
   transform: rotate(calc(var(--poem-tilt) * -1));
-  transition: transform var(--transition-fast);
+  transition: transform var(--transition-fast), background-color var(--transition-fast);
 }
 
 article.poem:nth-of-type(even) {
@@ -162,6 +168,32 @@ article.poem p {
   margin: 0;
 }
 
+/* ---------- Theme toggle ---------- */
+button.theme-toggle {
+  margin-block-start: var(--space-xs);
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-md);
+  background: transparent;
+  color: var(--theme-ink);
+  border: var(--hairline);
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+button.theme-toggle:hover {
+  background: var(--theme-paper-lit);
+  color: var(--theme-brass-text);
+}
+
+button.theme-toggle:focus-visible {
+  outline: 2px solid var(--theme-rose);
+  outline-offset: 3px;
+}
+
 /* ---------- Links ---------- */
 a {
   color: var(--theme-rose);
@@ -169,7 +201,7 @@ a {
 }
 
 a:hover {
-  color: var(--theme-brass-deep);
+  color: var(--theme-brass-text);
 }
 
 a:focus-visible {
