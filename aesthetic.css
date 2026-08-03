@@ -6,34 +6,48 @@
    taped inside, a candle behind the paper. So the page is warm paper,
    brass rules, and rose ink, lit from the top.
 
-   Rough draft. Colour, type, and spacing are in; texture, the webfonts,
-   and the dusk theme come next. */
+   Colours are declared in two layers. The theme layer holds the actual
+   values, and everything else points at the theme instead of repeating a
+   colour, so a second theme only has to redefine the top block. */
 
-/* ---------- Variables ---------- */
+/* ---------- Theme ---------- */
 :root {
   --hue-gold: 38;
   --hue-rose: 348;
   --hue-ink: 22;
 
-  --color-paper: hsl(var(--hue-gold), 52%, 96%);
-  --color-page: hsl(var(--hue-gold), 64%, 99%);
-  --color-ink: hsl(var(--hue-ink), 22%, 19%);
-  --color-ink-soft: hsl(var(--hue-ink), 14%, 36%);
-  --color-gold: hsl(var(--hue-gold), 46%, 45%);
-  --color-rose: hsl(var(--hue-rose), 36%, 42%);
+  --theme-paper: hsl(var(--hue-gold), 52%, 96%);
+  --theme-paper-lit: hsl(var(--hue-gold), 64%, 99%);
+  --theme-ink: hsl(var(--hue-ink), 22%, 19%);
+  --theme-ink-soft: hsl(var(--hue-ink), 14%, 36%);
+  --theme-brass: hsl(var(--hue-gold), 46%, 45%);
+  /* the hairline brass is too pale to read as text, so text gets a darker one */
+  --theme-brass-deep: hsl(var(--hue-gold), 60%, 30%);
+  --theme-rose: hsl(var(--hue-rose), 36%, 42%);
+  --theme-candle: hsla(var(--hue-gold), 70%, 84%, 0.3);
+}
 
+/* ---------- Components ---------- */
+:root {
   --font-body: Georgia, "Iowan Old Style", "Times New Roman", serif;
-  --font-heading: "Palatino Linotype", Palatino, Georgia, serif;
+  --font-heading: "Cormorant Garamond", Palatino, Georgia, serif;
 
-  /* a poem line should never outrun the eye */
-  --measure: 36rem;
+  /* clamp keeps the headings in step with the viewport without a media query */
+  --page-title-size: clamp(2rem, 1.6rem + 1.8vw, 2.75rem);
+  --poem-title-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+
+  /* ch measures in characters, so a poem line never outruns the eye */
+  --page-measure: 62ch;
+  --page-gutter: 1.25rem;
 
   --space-xs: 0.5rem;
   --space-sm: 0.75rem;
   --space-md: 1.25rem;
   --space-lg: 2rem;
 
-  --rule: 1px solid var(--color-gold);
+  --hairline: 1px solid var(--theme-brass);
+  --poem-tilt: 0.4deg;
+  --transition-fast: 200ms ease;
 }
 
 /* ---------- Base ---------- */
@@ -42,35 +56,52 @@
 }
 
 body {
+  /* three rows so the footer stays put on a short page */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
   margin: 0;
-  padding-inline: var(--space-md);
-  background-color: var(--color-paper);
+  padding-inline: var(--page-gutter);
+  background-color: var(--theme-paper);
   /* the candle behind the paper: a faint warm wash at the top, nothing you
      should notice while reading */
-  background-image: radial-gradient(ellipse at top, hsla(var(--hue-gold), 70%, 84%, 0.3), transparent 55%);
+  background-image: radial-gradient(ellipse at top, var(--theme-candle), transparent 55%);
   background-repeat: no-repeat;
   background-size: 100% 28rem;
-  color: var(--color-ink);
+  color: var(--theme-ink);
   font-family: var(--font-body);
   line-height: 1.7;
+  /* a long poem line breaks instead of pushing the page sideways */
+  overflow-wrap: break-word;
 }
 
 /* ---------- Layout ---------- */
 header, main, footer {
-  max-width: var(--measure);
+  width: 100%;
+  max-width: var(--page-measure);
   margin-inline: auto;
 }
 
 header {
   padding-block: var(--space-sm);
-  border-block-end: var(--rule);
+  border-block-end: var(--hairline);
   text-align: center;
+}
+
+header a {
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+header a:hover,
+header a:focus-visible {
+  text-decoration: underline;
 }
 
 footer {
   padding-block: var(--space-md);
-  border-block-start: var(--rule);
-  color: var(--color-ink-soft);
+  border-block-start: var(--hairline);
+  color: var(--theme-ink-soft);
   font-size: 0.9375rem;
   text-align: center;
 }
@@ -79,49 +110,76 @@ footer p {
   margin: 0;
 }
 
-/* Each poem is its own taped-down square of paper, so the corners stay sharp */
-article {
-  margin-block: var(--space-lg);
-  padding: var(--space-md);
-  background: var(--color-page);
-  border: var(--rule);
-}
-
-article p {
-  margin: 0;
-}
-
 /* ---------- Type ---------- */
 h1, h2 {
   font-family: var(--font-heading);
-  font-weight: normal;
+  font-weight: 600;
   line-height: 1.3;
 }
 
 h1 {
   margin-block: var(--space-lg) var(--space-xs);
-  font-size: 2.25rem;
+  font-size: var(--page-title-size);
   text-align: center;
 }
 
-h2 {
+/* the line under the title, before the poems start */
+main > p {
+  margin-block: 0 var(--space-lg);
+  color: var(--theme-ink-soft);
+  text-align: center;
+}
+
+/* ---------- Poems ---------- */
+/* Each poem is a square of paper taped to the wall, so the corners stay
+   sharp and it hangs a little crooked. Hover straightens it. */
+article.poem {
+  margin-block: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--theme-paper-lit);
+  border: var(--hairline);
+  transform: rotate(calc(var(--poem-tilt) * -1));
+  transition: transform var(--transition-fast);
+}
+
+article.poem:nth-of-type(even) {
+  transform: rotate(var(--poem-tilt));
+}
+
+article.poem:hover,
+article.poem:focus-within {
+  transform: rotate(0deg);
+}
+
+article.poem h2 {
   margin-block: 0 var(--space-sm);
-  font-size: 1.375rem;
+  font-size: var(--poem-title-size);
   font-style: italic;
-  color: var(--color-rose);
+  color: var(--theme-rose);
+}
+
+article.poem p {
+  margin: 0;
 }
 
 /* ---------- Links ---------- */
 a {
-  color: var(--color-rose);
+  color: var(--theme-rose);
   text-underline-offset: 3px;
 }
 
 a:hover {
-  color: var(--color-gold);
+  color: var(--theme-brass-deep);
 }
 
 a:focus-visible {
-  outline: 2px solid var(--color-rose);
+  outline: 2px solid var(--theme-rose);
   outline-offset: 3px;
+}
+
+/* ---------- Accessibility: user preferences win ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
 }
