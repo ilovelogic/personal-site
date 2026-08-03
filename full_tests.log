@@ -1,0 +1,3 @@
+warning: `--extra mds` has no effect when used outside of a project
+warning: `--locked` has no effect when used outside of a project
+/Users/shimmernight/.local/share/uv/python/cpython-3.12-macos-aarch64-none/bin/python3.12: can't open file '/Users/shimmernight/personal-site/tests/run_tests.py': [Errno 2] No such file or directory
