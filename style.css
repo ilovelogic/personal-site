@@ -1,16 +1,232 @@
-/* Structural borders only, per HW2 constraint: no presentation beyond border/border-width */
-header, main, footer, nav, section, article, fieldset, dialog, iframe, canvas, audio, video {
-  border: 1px solid #333;
+/* ---------- Variables ---------- */
+/* CSS custom properties instead of magic values (per lecture: "try to avoid CSS magic values") */
+:root {
+  /* the whole site is built from two neighbouring pink hues */
+  --hue-rose: 340;
+  --hue-blush: 350;
+
+  --color-rose-deep: hsl(var(--hue-rose), 32%, 33%);
+  --color-rose-mid: hsl(var(--hue-rose), 40%, 45%);
+  --color-rose: hsl(var(--hue-rose), 40%, 58%);
+  --color-blush: hsl(var(--hue-blush), 65%, 90%);
+  --color-petal: hsl(var(--hue-blush), 70%, 95%);
+  --color-cream: hsl(var(--hue-blush), 60%, 98%);
+  --color-text: hsl(var(--hue-rose), 18%, 22%);
+
+  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-heading: Georgia, "Times New Roman", serif;
+
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+
+  --radius: 0.75rem;
+  --shadow-card: 0 0.25rem 1rem hsla(var(--hue-rose), 30%, 40%, 0.12);
+
+  --transition-fast: 150ms ease;
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+img, picture, svg {
+  max-width: 100%;
+  /* without this the width shrinks but the height attribute stays put,
+     which stretches the picture */
+  height: auto;
+}
+
+/* ---------- Base elements ---------- */
+body {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  line-height: 1.6;
+  background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-blush) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  color: var(--color-rose-deep);
+  line-height: 1.25;
+}
+
+a {
+  color: var(--color-rose-deep);
+}
+
+a:hover, a:focus-visible {
+  color: var(--color-rose-mid);
+  text-decoration-style: wavy;
+}
+
+/* ---------- Header & footer ---------- */
+header, footer {
+  background: linear-gradient(120deg, var(--color-blush), var(--color-petal));
+  color: var(--color-text);
+  padding-block: var(--space-sm);
+  padding-inline: var(--space-md);
+}
+
+header nav a, footer a {
+  color: var(--color-rose-deep);
+  text-decoration: none;
+  padding-inline: var(--space-xs);
+}
+
+header nav a:hover, header nav a:focus-visible,
+footer a:hover, footer a:focus-visible {
+  color: var(--color-rose-mid);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}
+
+/* ---------- Main layout ---------- */
+main {
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: var(--space-lg);
+  background: hsla(var(--hue-blush), 60%, 98%, 0.92);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  margin-block: var(--space-lg);
+}
+
+/* ---------- Cards: section, article, custom skill-story element ---------- */
+section, article, skill-story {
+  display: block;
+  background: var(--color-cream);
+  border-inline-start: 0.3rem solid var(--color-rose);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-block: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Photo grid ---------- */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-sm);
+  align-items: start;
 }
 
 .photo-grid img {
-  border: 1px solid #333;
+  border: 0.2rem solid var(--color-rose);
+  border-radius: calc(var(--radius) / 1.5);
 }
 
-/* custom element: exempt from the CSS property limit per the Custom Element #1 note */
-skill-story {
-  display: block;
-  border: 1px solid #333;
-  margin: 0.5em 0;
-  padding: 0.5em;
+/* ---------- Lists ---------- */
+ul, ol {
+  padding-inline-start: var(--space-lg);
+}
+
+li::marker {
+  color: var(--color-rose-deep);
+}
+
+/* ---------- Forms ---------- */
+fieldset {
+  border: 1px solid var(--color-rose);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  margin-block: var(--space-md);
+}
+
+legend {
+  color: var(--color-rose-deep);
+  font-weight: bold;
+  padding-inline: var(--space-xs);
+}
+
+label {
+  display: inline-block;
+  margin-block-end: var(--space-xs);
+}
+
+input, textarea, button {
+  font: inherit;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: var(--space-xs);
+  border: 1px solid var(--color-rose);
+  border-radius: calc(var(--radius) / 2);
+  background: white;
+}
+
+input[type="text"]:focus-visible, textarea:focus-visible {
+  outline: 0.15rem solid var(--color-rose-mid);
+  outline-offset: 0.1rem;
+}
+
+input[type="radio"], progress {
+  accent-color: var(--color-rose-deep);
+}
+
+button {
+  background: linear-gradient(120deg, var(--color-blush), var(--color-petal));
+  color: var(--color-rose-deep);
+  border: none;
+  border-radius: calc(var(--radius) / 2);
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-md);
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+}
+
+button:hover, button:focus-visible {
+  filter: brightness(1.1);
+}
+
+progress {
+  width: 100%;
+}
+
+/* ---------- Dialog ---------- */
+dialog {
+  border: 1px solid var(--color-rose);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Accessibility: user preferences win ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* Dark mode repoints the same pink tokens, so every rule above follows along
+   and only the two hardcoded backgrounds need restating. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-rose-deep: hsl(var(--hue-blush), 55%, 82%);
+    --color-rose-mid: hsl(var(--hue-blush), 45%, 72%);
+    --color-rose: hsl(var(--hue-rose), 30%, 42%);
+    --color-blush: hsl(var(--hue-rose), 16%, 20%);
+    --color-petal: hsl(var(--hue-rose), 14%, 25%);
+    --color-cream: hsl(var(--hue-rose), 12%, 16%);
+    --color-text: hsl(var(--hue-blush), 20%, 92%);
+    --shadow-card: 0 0.25rem 1rem hsla(var(--hue-rose), 40%, 4%, 0.5);
+  }
+
+  main {
+    background: hsla(var(--hue-rose), 12%, 16%, 0.92);
+  }
+
+  input[type="text"], textarea {
+    background: hsl(var(--hue-rose), 12%, 22%);
+    color: var(--color-text);
+  }
 }
