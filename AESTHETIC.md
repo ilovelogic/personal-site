@@ -6,7 +6,7 @@
 
 ## How the CSS expresses it
 
-I lovingly brought this aesthetic into birth, developing it from things I have
+I brought this aesthetic into a new embodiment, coaxing it out of things I have
 made, such as lanterns with hand-lettered panels taped inside and a candle 
 blazing behind the paper. From there came my pallete. The background is warm
 paper instead of white, body text is a warm brown instead of black, the hairline
