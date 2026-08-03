@@ -1,24 +1,17 @@
 /* ---------- Variables ---------- */
 /* CSS custom properties instead of magic values (per lecture: "try to avoid CSS magic values") */
 :root {
-  --hue-dusk: 262;
-  --hue-plum: 322;
-  --hue-coral: 12;
-  --hue-amber: 36;
-  /* dedicated gentler hue for header/footer only: a muted dusty rose, warmer and lighter than --hue-dusk */
-  --hue-header: 350;
+  /* the whole site is built from two neighbouring pink hues */
+  --hue-rose: 340;
+  --hue-blush: 350;
 
-  --color-sky-deep: hsl(var(--hue-dusk), 48%, 14%);
-  --color-sky-mid: hsl(var(--hue-plum), 55%, 28%);
-  --color-coral: hsl(var(--hue-coral), 82%, 60%);
-  --color-coral-deep: hsl(var(--hue-coral), 70%, 42%);
-  --color-amber: hsl(var(--hue-amber), 88%, 63%);
-  --color-cream: hsl(var(--hue-amber), 60%, 97%);
-  --color-text: hsl(var(--hue-dusk), 35%, 14%);
-  --color-text-on-dusk: hsl(var(--hue-amber), 55%, 94%);
-
-  --color-header-start: hsl(var(--hue-header), 28%, 40%);
-  --color-header-end: hsl(var(--hue-coral), 38%, 48%);
+  --color-rose-deep: hsl(var(--hue-rose), 32%, 33%);
+  --color-rose-mid: hsl(var(--hue-rose), 40%, 45%);
+  --color-rose: hsl(var(--hue-rose), 40%, 58%);
+  --color-blush: hsl(var(--hue-blush), 65%, 90%);
+  --color-petal: hsl(var(--hue-blush), 70%, 95%);
+  --color-cream: hsl(var(--hue-blush), 60%, 98%);
+  --color-text: hsl(var(--hue-rose), 18%, 22%);
 
   --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-heading: Georgia, "Times New Roman", serif;
@@ -29,7 +22,7 @@
   --space-lg: 2rem;
 
   --radius: 0.75rem;
-  --shadow-card: 0 0.25rem 1rem hsla(var(--hue-dusk), 60%, 15%, 0.15);
+  --shadow-card: 0 0.25rem 1rem hsla(var(--hue-rose), 30%, 40%, 0.12);
 
   --transition-fast: 150ms ease;
 }
@@ -45,6 +38,9 @@ body {
 
 img, picture, svg {
   max-width: 100%;
+  /* without this the width shrinks but the height attribute stays put,
+     which stretches the picture */
+  height: auto;
 }
 
 /* ---------- Base elements ---------- */
@@ -52,44 +48,43 @@ body {
   font-family: var(--font-body);
   color: var(--color-text);
   line-height: 1.6;
-  background:
-    radial-gradient(ellipse at top, hsl(var(--hue-amber), 90%, 88%), transparent 60%),
-    linear-gradient(180deg, hsl(var(--hue-coral), 70%, 80%) 0%, hsl(var(--hue-plum), 45%, 70%) 55%, var(--color-sky-mid) 100%);
+  background: linear-gradient(180deg, var(--color-cream) 0%, var(--color-blush) 100%);
+  background-attachment: fixed;
   min-height: 100vh;
 }
 
 h1, h2, h3, h4 {
   font-family: var(--font-heading);
-  color: var(--color-coral-deep);
+  color: var(--color-rose-deep);
   line-height: 1.25;
 }
 
 a {
-  color: var(--color-coral-deep);
+  color: var(--color-rose-deep);
 }
 
 a:hover, a:focus-visible {
-  color: var(--color-amber);
+  color: var(--color-rose-mid);
   text-decoration-style: wavy;
 }
 
 /* ---------- Header & footer ---------- */
 header, footer {
-  background: linear-gradient(120deg, var(--color-header-start), var(--color-header-end));
-  color: var(--color-text-on-dusk);
+  background: linear-gradient(120deg, var(--color-blush), var(--color-petal));
+  color: var(--color-text);
   padding-block: var(--space-sm);
   padding-inline: var(--space-md);
 }
 
 header nav a, footer a {
-  color: var(--color-amber);
+  color: var(--color-rose-deep);
   text-decoration: none;
   padding-inline: var(--space-xs);
 }
 
 header nav a:hover, header nav a:focus-visible,
 footer a:hover, footer a:focus-visible {
-  color: var(--color-cream);
+  color: var(--color-rose-mid);
   text-decoration: underline;
   text-decoration-style: wavy;
 }
@@ -99,7 +94,7 @@ main {
   max-width: 42rem;
   margin-inline: auto;
   padding: var(--space-lg);
-  background: hsla(var(--hue-amber), 60%, 97%, 0.9);
+  background: hsla(var(--hue-blush), 60%, 98%, 0.92);
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   margin-block: var(--space-lg);
@@ -109,11 +104,24 @@ main {
 section, article, skill-story {
   display: block;
   background: var(--color-cream);
-  border-inline-start: 0.3rem solid var(--color-coral);
+  border-inline-start: 0.3rem solid var(--color-rose);
   border-radius: var(--radius);
   padding: var(--space-md);
   margin-block: var(--space-md);
   box-shadow: var(--shadow-card);
+}
+
+/* ---------- Photo grid ---------- */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-sm);
+  align-items: start;
+}
+
+.photo-grid img {
+  border: 0.2rem solid var(--color-rose);
+  border-radius: calc(var(--radius) / 1.5);
 }
 
 /* ---------- Lists ---------- */
@@ -122,19 +130,19 @@ ul, ol {
 }
 
 li::marker {
-  color: var(--color-coral-deep);
+  color: var(--color-rose-deep);
 }
 
 /* ---------- Forms ---------- */
 fieldset {
-  border: 1px solid hsl(var(--hue-coral), 40%, 80%);
+  border: 1px solid var(--color-rose);
   border-radius: var(--radius);
   padding: var(--space-md);
   margin-block: var(--space-md);
 }
 
 legend {
-  color: var(--color-coral-deep);
+  color: var(--color-rose-deep);
   font-weight: bold;
   padding-inline: var(--space-xs);
 }
@@ -151,23 +159,23 @@ input, textarea, button {
 input[type="text"], textarea {
   width: 100%;
   padding: var(--space-xs);
-  border: 1px solid hsl(var(--hue-coral), 40%, 75%);
+  border: 1px solid var(--color-rose);
   border-radius: calc(var(--radius) / 2);
   background: white;
 }
 
 input[type="text"]:focus-visible, textarea:focus-visible {
-  outline: 0.15rem solid var(--color-amber);
+  outline: 0.15rem solid var(--color-rose-mid);
   outline-offset: 0.1rem;
 }
 
 input[type="radio"], progress {
-  accent-color: var(--color-coral-deep);
+  accent-color: var(--color-rose-deep);
 }
 
 button {
-  background: linear-gradient(120deg, var(--color-coral), var(--color-amber));
-  color: var(--color-sky-deep);
+  background: linear-gradient(120deg, var(--color-blush), var(--color-petal));
+  color: var(--color-rose-deep);
   border: none;
   border-radius: calc(var(--radius) / 2);
   padding-block: var(--space-xs);
@@ -186,7 +194,7 @@ progress {
 
 /* ---------- Dialog ---------- */
 dialog {
-  border: 1px solid var(--color-amber);
+  border: 1px solid var(--color-rose);
   border-radius: var(--radius);
   padding: var(--space-md);
   box-shadow: var(--shadow-card);
@@ -199,25 +207,26 @@ dialog {
   }
 }
 
+/* Dark mode repoints the same pink tokens, so every rule above follows along
+   and only the two hardcoded backgrounds need restating. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-cream: hsl(var(--hue-dusk), 30%, 18%);
-    --color-text: hsl(var(--hue-amber), 40%, 92%);
-    --color-text-on-dusk: hsl(var(--hue-amber), 55%, 94%);
-  }
-
-  body {
-    background:
-      radial-gradient(ellipse at top, hsl(var(--hue-plum), 45%, 24%), transparent 60%),
-      linear-gradient(180deg, hsl(var(--hue-plum), 40%, 18%) 0%, var(--color-sky-deep) 100%);
+    --color-rose-deep: hsl(var(--hue-blush), 55%, 82%);
+    --color-rose-mid: hsl(var(--hue-blush), 45%, 72%);
+    --color-rose: hsl(var(--hue-rose), 30%, 42%);
+    --color-blush: hsl(var(--hue-rose), 16%, 20%);
+    --color-petal: hsl(var(--hue-rose), 14%, 25%);
+    --color-cream: hsl(var(--hue-rose), 12%, 16%);
+    --color-text: hsl(var(--hue-blush), 20%, 92%);
+    --shadow-card: 0 0.25rem 1rem hsla(var(--hue-rose), 40%, 4%, 0.5);
   }
 
   main {
-    background: hsla(var(--hue-dusk), 30%, 18%, 0.92);
+    background: hsla(var(--hue-rose), 12%, 16%, 0.92);
   }
 
   input[type="text"], textarea {
-    background: hsl(var(--hue-dusk), 25%, 22%);
+    background: hsl(var(--hue-rose), 12%, 22%);
     color: var(--color-text);
   }
 }
